@@ -43,6 +43,15 @@ function Home () {
     setCurrentPage(pageNumber)
   }
 
+  useEffect(()=>{
+    if(sortByYear){
+      dispatch(searchActions.updateMoviesList({movies:data.Search,sortByYear:true}))
+    }
+    if(sortByTitle){
+      dispatch(searchActions.updateMoviesList({movies:data.Search,sortByTitle:true}))
+    }
+  },[dispatch,sortByTitle,sortByYear,data])
+
   const searchHandler = () => {
     navigate(`?search=${searchTermRef.current.value}`)
     searchTermRef.current.value = ''
@@ -50,6 +59,7 @@ function Home () {
 
   const searchByYearHandler = () => {
     navigate(`?search=${searchValue}&year=${yearInpRef.current.value}`)
+    yearInpRef.current.value = ''
   }
 
   const addToFavouriteHandler = movie => {
@@ -59,33 +69,11 @@ function Home () {
   const sortByYearChangeHandler = async () => {
     setSortByYear(prev => !prev)
     setSortByTitle(false)
-    // Is it the right way?
-    // setSortByYear(prev=>{
-    //   console.log(prev)
-    //   if(!prev){
-    //     const sortedMovieList = [...movies].sort((curr,next) => curr.Year - next.Year)
-    //     setMovies(sortedMovieList)
-    //   }
-    //   return !prev
-    // })
-
-    if (!sortByYear) {
-      // It's logically incorrect please tell me the right way to do this
-      // const sortedMovieList = [...movies].sort(
-      //   (curr, next) => curr.Year - next.Year
-      // )
-      // setMovies(sortedMovieList)
-      dispatch(searchActions.updateMoviesList({movies:data.Search,sortByYear:true}))
-      // [...movies].sort((curr,next)=>curr.Year - next.Year)
-    }
   }
 
   const sortByTitleChangeHandler = () => {
     setSortByTitle(prev => !prev)
     setSortByYear(false)
-    if(!sortByTitle){
-      dispatch(searchActions.updateMoviesList({movies:data.Search,sortByTitle:true}))
-    }
   }
 
   return (
@@ -129,7 +117,7 @@ function Home () {
           Search by Year :
           <input
             type='number'
-            // onChange={searchByYearHandler}
+            onClick={searchByYearHandler}
             onKeyPress={event => {
               if (event.key === 'Enter') {
                 searchByYearHandler()
