@@ -3,17 +3,20 @@ import { useSearchMoviesQuery } from '../api/movieApi'
 import { useLocation, useNavigate } from 'react-router-dom'
 import MovieItem from './MovieItem'
 import classes from './Home.module.css'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { favouritesActions } from '../slice/favourites-slice'
+import {searchActions} from '../slice/search-slice'
 
 function Home () {
   const location = useLocation()
   const navigate = useNavigate()
   const [sortByYear, setSortByYear] = useState(false)
-  const [movies, setMovies] = useState([])
+  const [sortByTitle,setSortByTitle] = useState(false)
   const dispatch = useDispatch()
   const searchTermRef = useRef()
   const yearInpRef = useRef()
+
+  const movies = useSelector(state=>state.search.movies)
 
   const queryParams = new URLSearchParams(location.search)
   const searchValue = queryParams.get('search')
@@ -25,9 +28,9 @@ function Home () {
   })
 
   useEffect(() => {
-    isSuccess && data.Response === 'True' && setMovies(data.Search)
-    // console.log(data)
-  }, [isSuccess, data])
+    // isSuccess && data.Response === 'True' && setMovies(data.Search)
+    isSuccess && data.Response === 'True' && dispatch(searchActions.updateMoviesList({movies:data.Search,sorted:false}))
+  }, [isSuccess,data,dispatch])
 
   const [currentPage, setCurrentPage] = useState(1)
   const moviesPerPage = 5
@@ -55,7 +58,7 @@ function Home () {
 
   const sortByYearChangeHandler = async () => {
     setSortByYear(prev => !prev)
-
+    setSortByTitle(false)
     // Is it the right way?
     // setSortByYear(prev=>{
     //   console.log(prev)
@@ -68,10 +71,20 @@ function Home () {
 
     if (!sortByYear) {
       // It's logically incorrect please tell me the right way to do this
-      const sortedMovieList = [...movies].sort(
-        (curr, next) => curr.Year - next.Year
-      )
-      setMovies(sortedMovieList)
+      // const sortedMovieList = [...movies].sort(
+      //   (curr, next) => curr.Year - next.Year
+      // )
+      // setMovies(sortedMovieList)
+      dispatch(searchActions.updateMoviesList({movies:data.Search,sortByYear:true}))
+      // [...movies].sort((curr,next)=>curr.Year - next.Year)
+    }
+  }
+
+  const sortByTitleChangeHandler = () => {
+    setSortByTitle(prev => !prev)
+    setSortByYear(false)
+    if(!sortByTitle){
+      dispatch(searchActions.updateMoviesList({movies:data.Search,sortByTitle:true}))
     }
   }
 
@@ -104,6 +117,15 @@ function Home () {
           />
         </label>
         <label className={classes.sortLabel}>
+          Sort by Title:
+          <input
+            type='checkbox'
+            checked={sortByTitle}
+            onChange={sortByTitleChangeHandler}
+            className={classes.sortCheckbox}
+          />
+        </label>
+        <label className={classes.sortLabel}>
           Search by Year :
           <input
             type='number'
@@ -125,7 +147,7 @@ function Home () {
       {isLoading && <p>Loading...</p>}
       {data?.Error && <p>{data.Error}</p>}
       {isSuccess &&
-        currentMovies.map(item => (
+        currentMovies?.map(item => (
           <MovieItem
             key={item.imdbID}
             item={item}
