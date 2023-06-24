@@ -14,7 +14,7 @@ function Favourites() {
 
   return (
     <div>
-			{favouriteMovies?.map((item)=><MovieItem item={item} name="Remove Favourite" onRemove={removeFavouriteHandler} type="remove"/>)}
+			{favouriteMovies?.map((item)=><MovieItem key={item.imdbID} item={item} name="Remove Favourite" onRemove={removeFavouriteHandler} type="remove"/>)}
     </div>
   )
 }
