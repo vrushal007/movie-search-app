@@ -3,8 +3,8 @@ import { useSearchMoviesQuery } from '../api/movieApi'
 import { useLocation, useNavigate } from 'react-router-dom'
 import MovieItem from './MovieItem'
 import classes from './Home.module.css'
-import {useDispatch} from 'react-redux'
-import {favouritesActions} from '../slice/favourites-slice'
+import { useDispatch } from 'react-redux'
+import { favouritesActions } from '../slice/favourites-slice'
 
 function Home () {
   const location = useLocation()
@@ -13,10 +13,16 @@ function Home () {
   const [movies, setMovies] = useState([])
   const dispatch = useDispatch()
   const searchTermRef = useRef()
+  const yearInpRef = useRef()
 
   const queryParams = new URLSearchParams(location.search)
   const searchValue = queryParams.get('search')
-  const { data, isLoading, isSuccess } = useSearchMoviesQuery(searchValue)
+  const yearValue = queryParams.get('year')
+
+  const { data, isLoading, isSuccess } = useSearchMoviesQuery({
+    title: searchValue,
+    year: yearValue ? yearValue : ''
+  })
 
   useEffect(() => {
     isSuccess && data.Response === 'True' && setMovies(data.Search)
@@ -36,13 +42,17 @@ function Home () {
 
   const searchHandler = () => {
     navigate(`?search=${searchTermRef.current.value}`)
+    searchTermRef.current.value = ''
   }
 
-  const addToFavouriteHandler = (movie) => {
+  const searchByYearHandler = () => {
+    navigate(`?search=${searchValue}&year=${yearInpRef.current.value}`)
+  }
+
+  const addToFavouriteHandler = movie => {
     dispatch(favouritesActions.addMovieToFavourite(movie))
   }
 
-  
   const sortByYearChangeHandler = async () => {
     setSortByYear(prev => !prev)
 
@@ -94,15 +104,24 @@ function Home () {
           />
         </label>
         <label className={classes.sortLabel}>
-          Search by Year
+          Search by Year :
           <input
             type='number'
             // onChange={searchByYearHandler}
-            className={classes.sortCheckbox}
+            onKeyPress={event => {
+              if (event.key === 'Enter') {
+                searchByYearHandler()
+              }
+            }}
+            className={classes.searchInput}
+            ref={yearInpRef}
           />
-          <button>Click</button>
+          <button className={classes.searchButton} onClick={searchByYearHandler}>
+            Click
+          </button>
         </label>
       </div>
+      <h2>Search Results for "{searchValue} ({`for year ${yearValue ? yearValue : 'NA'}`})"</h2>
       {isLoading && <p>Loading...</p>}
       {data?.Error && <p>{data.Error}</p>}
       {isSuccess &&
@@ -112,7 +131,7 @@ function Home () {
             item={item}
             name='Add to Favourite'
             onAdd={addToFavouriteHandler}
-            type="add"
+            type='add'
           />
         ))}
 
