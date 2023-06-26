@@ -3,19 +3,21 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useSearchMovieByIdQuery } from '../api/movieApi'
 
 import classes from './MovieDetail.module.css'
+import DoesNotExist from './DoesNotExist'
 
 function MovieDetail () {
   const { id } = useParams()
-  const { data: movie, isLoading, isSuccess } = useSearchMovieByIdQuery(id)
+  const { data: movie, isLoading, isSuccess, isError, error } = useSearchMovieByIdQuery(id)
   const navigate = useNavigate()
   const backToHomeHandler = () => {
     navigate('/')
   }
-  
   return (
     <div>
       {isLoading && <p>Loading...</p>}
-      {isSuccess && (
+      {isError && <p>Something wrong. {error.error}</p>}
+      {isSuccess && movie.Response === 'False' && <DoesNotExist />}
+      {isSuccess && movie.Response === 'True' && (
         <div className={classes.movieDetailContainer}>
           <div className={classes.rowContainer}>
             <div className={classes.posterContainer}>
@@ -88,7 +90,7 @@ function MovieDetail () {
             <div className={classes.row}>
               <span className={classes.label}>Ratings:</span>
               <div className={classes.value}>
-                {movie.Ratings.map(rating => (
+                {movie.Ratings?.map(rating => (
                   <div key={rating.Source}>
                     {rating.Source}: {rating.Value}
                   </div>

@@ -18,7 +18,6 @@ export const movieApi = createApi({
         }
         return url
       }
-        
     }),
     searchMovieById: builder.query({
       query: id => `/?apikey=${apikey}&i=${id}`

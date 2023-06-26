@@ -7,7 +7,10 @@ const favouritesSlice = createSlice({
     },
     reducers:{
         addMovieToFavourite(state,action){
-            state.movies.push(action.payload)
+            const isPresent = state.movies.some(movie => movie.imdbID === action.payload.imdbID)
+            if(!isPresent){
+                state.movies.push(action.payload)
+            }
         },
         removeMovieFromFavourite(state,action){
             state.movies = state.movies.filter((item) => item.imdbID !== action.payload)

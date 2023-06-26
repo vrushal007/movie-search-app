@@ -1,14 +1,23 @@
 import React from 'react'
 import classes from './MovieItem.module.css'
 import {useNavigate} from 'react-router-dom'
+import {useDispatch} from 'react-redux'
+import {favouritesActions} from '../slice/favourites-slice'
 
 const MovieItem = props => {
+  const dispatch = useDispatch()
   const favouriteHandler = () => {
-    if(props.type === 'add'){
-      props.onAdd(props.item)
+    if(!props.item.favourite){
+      dispatch(favouritesActions.addMovieToFavourite({
+        Title:props.item.Title,
+        Year:props.item.Year,
+        imdbID:props.item.imdbID,
+        Type:props.item.Type,
+        Poster:props.item.Poster
+      }))
     }
-    if(props.type === 'remove'){
-      props.onRemove(props.item.imdbID)
+    if(props.item.favourite){
+      dispatch(favouritesActions.removeMovieFromFavourite(props.item.imdbID))
     }
   }
 	const navigate = useNavigate()
@@ -28,10 +37,10 @@ const MovieItem = props => {
         <p className={classes.year}>{props.item.Year}</p>
       </div>
       <button
-        className={classes.addToFavorites}
+        className={`${classes.favBtn} ${!props.item.favourite ? classes.addToFav : classes.removeFav}`}
         onClick={favouriteHandler}
       >
-        {props.name}
+        {props.item.favourite ? 'Remove Favourite' : 'Add To Favourite'}
       </button>
     </div>
   )

@@ -3,6 +3,7 @@ import Home from "./components/Home";
 import MovieDetail from "./components/MovieDetail";
 import Favourites from "./components/Favourites";
 import Header from "./components/Header";
+import DoesNotExist from "./components/DoesNotExist";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/" element={<Home />}/>
         <Route path="/:id" element={<MovieDetail />}/>
         <Route path="/favourites" element={<Favourites />}/>
+        <Route path="*" element={<DoesNotExist />} />
       </Routes>
     </div>
   );

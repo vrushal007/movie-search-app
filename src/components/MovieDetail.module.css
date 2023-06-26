@@ -51,7 +51,6 @@
 
 .button{
   width: 10rem;
-  /* justify-self: center; */
   padding: 8px 12px;
   margin: 0 4px;
   background-color: #f0f0f0;
@@ -67,19 +66,6 @@
 }
 
 
-@media (max-width: 768px) {
-  .movieDetailContainer {
-    flex-direction: column;
-  }
-
-  .posterContainer {
-    margin-bottom: 1rem;
-  }
-
-  .detailsContainer {
-    flex: none;
-  }
-}
 .movieDetailContainer {
   display: flex;
   margin: 1rem;
@@ -120,6 +106,17 @@
 }
 
 @media (max-width: 768px) {
+  .movieDetailContainer {
+    flex-direction: column;
+  }
+  
+  .posterContainer {
+    margin-bottom: 1rem;
+  }
+  
+  .detailsContainer {
+    flex: none;
+  }
   .movieDetailContainer {
     flex-direction: column;
   }

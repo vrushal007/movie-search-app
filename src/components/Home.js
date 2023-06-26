@@ -5,34 +5,53 @@ import MovieItem from './MovieItem'
 import classes from './Home.module.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { favouritesActions } from '../slice/favourites-slice'
-import {searchActions} from '../slice/search-slice'
+import { searchActions } from '../slice/search-slice'
 
 function Home () {
   const location = useLocation()
   const navigate = useNavigate()
   const [sortByYear, setSortByYear] = useState(false)
-  const [sortByTitle,setSortByTitle] = useState(false)
+  const [sortByTitle, setSortByTitle] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
   const dispatch = useDispatch()
   const searchTermRef = useRef()
   const yearInpRef = useRef()
 
-  const movies = useSelector(state=>state.search.movies)
+  const moviesData = useSelector(state => state.search.movies)
+  const favMovies = useSelector(state => state.favourite.movies)
+
+  const movies = moviesData?.map(movie => {
+    const isFavourite = favMovies?.some(
+      favMovie => favMovie.imdbID === movie.imdbID
+    )
+    return {
+      ...movie,
+      favourite: isFavourite
+    }
+  })
 
   const queryParams = new URLSearchParams(location.search)
   const searchValue = queryParams.get('search')
   const yearValue = queryParams.get('year')
 
-  const { data, isLoading, isSuccess } = useSearchMoviesQuery({
+  const { data, isLoading, isSuccess, isError, error } = useSearchMoviesQuery({
     title: searchValue,
     year: yearValue ? yearValue : ''
   })
 
   useEffect(() => {
     // isSuccess && data.Response === 'True' && setMovies(data.Search)
-    isSuccess && data.Response === 'True' && dispatch(searchActions.updateMoviesList({movies:data.Search,sorted:false}))
-  }, [isSuccess,data,dispatch])
+    isSuccess &&
+      data.Response === 'True' &&
+      dispatch(
+        searchActions.updateMoviesList({
+          movies: data.Search,
+          sortByYear: false,
+          sortByTitle: false
+        })
+      )
+  }, [isSuccess, data, dispatch])
 
-  const [currentPage, setCurrentPage] = useState(1)
   const moviesPerPage = 5
   const totalPages = Math.ceil(movies?.length / moviesPerPage)
   const indexOfLastMovie = currentPage * moviesPerPage
@@ -43,14 +62,24 @@ function Home () {
     setCurrentPage(pageNumber)
   }
 
-  useEffect(()=>{
-    if(sortByYear){
-      dispatch(searchActions.updateMoviesList({movies:data.Search,sortByYear:true}))
+  useEffect(() => {
+    if (sortByYear) {
+      dispatch(
+        searchActions.updateMoviesList({
+          movies: data.Search,
+          sortByYear: true
+        })
+      )
     }
-    if(sortByTitle){
-      dispatch(searchActions.updateMoviesList({movies:data.Search,sortByTitle:true}))
+    if (sortByTitle) {
+      dispatch(
+        searchActions.updateMoviesList({
+          movies: data.Search,
+          sortByTitle: true
+        })
+      )
     }
-  },[dispatch,sortByTitle,sortByYear,data])
+  }, [dispatch, sortByTitle, sortByYear, data])
 
   const searchHandler = () => {
     navigate(`?search=${searchTermRef.current.value}`)
@@ -117,7 +146,6 @@ function Home () {
           Search by Year :
           <input
             type='number'
-            onClick={searchByYearHandler}
             onKeyPress={event => {
               if (event.key === 'Enter') {
                 searchByYearHandler()
@@ -125,14 +153,23 @@ function Home () {
             }}
             className={classes.searchInput}
             ref={yearInpRef}
+            disabled={searchValue ? false : true}
           />
-          <button className={classes.searchButton} onClick={searchByYearHandler}>
+          <button
+            className={`${classes.searchButton}`}
+            onClick={searchByYearHandler}
+            disabled={searchValue ? false : true}
+          >
             Click
           </button>
         </label>
       </div>
-      <h2>Search Results for "{searchValue} ({`for year ${yearValue ? yearValue : 'NA'}`})"</h2>
+      <h2>
+        Search Results for "{searchValue} (
+        {`for year ${yearValue ? yearValue : 'N/A'}`})"
+      </h2>
       {isLoading && <p>Loading...</p>}
+      {isError && <p>Something went wrong. {error.error}</p>}
       {data?.Error && <p>{data.Error}</p>}
       {isSuccess &&
         currentMovies?.map(item => (
