@@ -13,6 +13,7 @@ function Home () {
   const [sortByYear, setSortByYear] = useState(false)
   const [sortByTitle, setSortByTitle] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
+  const [message,setMessage] = useState()
   const dispatch = useDispatch()
   const searchTermRef = useRef()
   const yearInpRef = useRef()
@@ -82,7 +83,12 @@ function Home () {
   }, [dispatch, sortByTitle, sortByYear, data])
 
   const searchHandler = () => {
-    navigate(`?search=${searchTermRef.current.value}`)
+    if(searchTermRef.current.value.trim() === ''){
+      setMessage('Please enter title to search.')
+    }else{
+      navigate(`?search=${searchTermRef.current.value}`)
+      setMessage('')
+    }
     searchTermRef.current.value = ''
   }
 
@@ -123,6 +129,7 @@ function Home () {
           Search
         </button>
       </div>
+      {message && <p style={{color:'red'}}>{message}</p>}
       <div className={classes.sortContainer}>
         <label className={classes.sortLabel}>
           Sort by Year:
