@@ -14,8 +14,8 @@ function MovieDetail () {
   }
   return (
     <div>
-      {isLoading && <p>Loading...</p>}
-      {isError && <p>Something wrong. {error.error}</p>}
+      {isLoading && <p data-testid="loading">Loading...</p>}
+      {isError && <p data-testid="error">Something wrong. {error.error}</p>}
       {isSuccess && movie.Response === 'False' && <DoesNotExist />}
       {isSuccess && movie.Response === 'True' && (
         <div className={classes.movieDetailContainer}>
@@ -91,16 +91,16 @@ function MovieDetail () {
               <span className={classes.label}>Ratings:</span>
               <div className={classes.value}>
                 {movie.Ratings?.map(rating => (
-                  <div key={rating.Source}>
+                  <div key={rating.Source} data-testid="rating">
                     {rating.Source}: {rating.Value}
                   </div>
                 ))}
               </div>
             </div>
           </div>
-          <button className={classes.button} onClick={backToHomeHandler}>Back to Home</button>
         </div>
       )}
+      <button data-testid="backBtn" className={classes.button} onClick={backToHomeHandler}>Back to Home</button>
     </div>
   )
 }

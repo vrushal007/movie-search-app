@@ -118,6 +118,7 @@ function Home () {
           type='text'
           placeholder='Search movies...'
           ref={searchTermRef}
+          data-testid="searchBar"
           className={classes.searchInput}
           onKeyPress={event => {
             if (event.key === 'Enter') {
@@ -125,11 +126,11 @@ function Home () {
             }
           }}
         />
-        <button onClick={searchHandler} className={classes.searchButton}>
+        <button onClick={searchHandler} data-testid="searchBtn" className={classes.searchButton}>
           Search
         </button>
       </div>
-      {message && <p style={{color:'red'}}>{message}</p>}
+      {message && <p style={{color:'red'}} data-testid="searchErrMsg">{message}</p>}
       <div className={classes.sortContainer}>
         <label className={classes.sortLabel}>
           Sort by Year:
@@ -138,6 +139,7 @@ function Home () {
             checked={sortByYear}
             onChange={sortByYearChangeHandler}
             className={classes.sortCheckbox}
+            data-testid="sortByYrChkBox"
           />
         </label>
         <label className={classes.sortLabel}>
@@ -147,6 +149,7 @@ function Home () {
             checked={sortByTitle}
             onChange={sortByTitleChangeHandler}
             className={classes.sortCheckbox}
+            data-testid="sortByTitleChkBox"
           />
         </label>
         <label className={classes.sortLabel}>
@@ -158,6 +161,7 @@ function Home () {
                 searchByYearHandler()
               }
             }}
+            data-testid="searchByTitleInp"
             className={classes.searchInput}
             ref={yearInpRef}
             disabled={searchValue ? false : true}
@@ -166,6 +170,7 @@ function Home () {
             className={`${classes.searchButton}`}
             onClick={searchByYearHandler}
             disabled={searchValue ? false : true}
+            data-testid="searchByYrBtn"
           >
             Click
           </button>
@@ -175,12 +180,13 @@ function Home () {
         Search Results for "{searchValue} (
         {`for year ${yearValue ? yearValue : 'N/A'}`})"
       </h2>
-      {isLoading && <p>Loading...</p>}
-      {isError && <p>Something went wrong. {error.error}</p>}
-      {data?.Error && <p>{data.Error}</p>}
+      {isLoading && <p data-testid="loading">Loading...</p>}
+      {isError && <p data-testid="fetchError">Something went wrong. {error.error}</p>}
+      {data?.Error && <p data-testid="apiResponseError">{data.Error}</p>}
       {isSuccess &&
         currentMovies?.map(item => (
           <MovieItem
+            data-testid="singleMovie"
             key={item.imdbID}
             item={item}
             name='Add to Favourite'
@@ -192,6 +198,7 @@ function Home () {
       <div className={classes.pagination}>
         {Array.from({ length: totalPages }, (_, index) => (
           <button
+            data-testid={`btnPage`}
             key={index + 1}
             onClick={() => handlePageChange(index + 1)}
             className={`${classes.pageButton} ${

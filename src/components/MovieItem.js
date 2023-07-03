@@ -26,19 +26,21 @@ const MovieItem = props => {
 	}
 
   return (
-    <div className={classes.movieItem}>
+    <div className={classes.movieItem} data-testid={props['data-testid']}>
       <img
+        data-testid="poster"
         src={props.item.Poster}
         alt={props.item.Title}
         className={classes.poster}
       />
-      <div className={classes.details} onClick={itemClickHandler}>
-        <h2 className={classes.title}>{props.item.Title}</h2>
-        <p className={classes.year}>{props.item.Year}</p>
+      <div className={classes.details} onClick={itemClickHandler} data-testid="container">
+        <h2 className={classes.title} data-testid="title">{props.item.Title}</h2>
+        <p className={classes.year} data-testid="year">{props.item.Year}</p>
       </div>
       <button
         className={`${classes.favBtn} ${!props.item.favourite ? classes.addToFav : classes.removeFav}`}
         onClick={favouriteHandler}
+        data-testid="btnFav"
       >
         {props.item.favourite ? 'Remove Favourite' : 'Add To Favourite'}
       </button>
